@@ -1,0 +1,7 @@
+assets
+python_modules
+.pyenv
+runs
+.menv
+yolov7
+yolov8
