@@ -57,11 +57,13 @@ class ASOne:
 
     def _update_args(self, kwargs):
         for key, value in kwargs.items():
+            print("kwarg items = ",kwargs.items())
             print("start update args, key = ",key,"value = ",value)
             print("config.keys = ",self.configss.keys())
             if key in self.configss.keys():
                 print("key in config.keys")
                 self.configss[key] = value
+                print("finish key input")
             else:
                 print("key is NOT in config.keys")
                 print(f'"{key}" argument not found! valid args: {list(self.configss.keys())}')
@@ -126,7 +128,6 @@ class ASOne:
             os.makedirs(output_dir, exist_ok=True)
             save_path = os.path.join(output_dir, filename)
             logger.info(f"video save path is {save_path}")
-
             video_writer = cv2.VideoWriter(
                 save_path,
                 cv2.VideoWriter_fourcc(*"mp4v"),
@@ -227,11 +228,11 @@ class ASOne:
     def _start_tracking(self,
                         stream_path: str,
                         config: dict) -> tuple:
-
+        print("ASone Start tracking")
         if not self.tracker:
             print(f'No tracker is selected. use detect() function perform detcetion or pass a tracker.')
             exit()
-
+        print("start config.pop")
         fps = config.pop('fps')
         output_dir = config.pop('output_dir')
         filename = config.pop('filename')
@@ -240,27 +241,28 @@ class ASOne:
         draw_trails = config.pop('draw_trails')
         class_names = config.pop('class_names')
         #class_names = ["lobster"]
-
+        print("start video capture")
         cap = cv2.VideoCapture(stream_path)
+        print("finished video capture")
         cap.set(cv2.CAP_PROP_BUFFERSIZE, 3)
         width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
         height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
         frame_count = cap.get(cv2.CAP_PROP_FRAME_COUNT)
 
         if fps is None:
-            fps = cap.get(cv2.CAP_PROP_FPS)
+            fps = 1
 
         if save_result:
             os.makedirs(output_dir, exist_ok=True)
             save_path = os.path.join(output_dir, filename)
             logger.info(f"video save path is {save_path}")
-
-            video_writer = cv2.VideoWriter(
-                save_path,
-                cv2.VideoWriter_fourcc(*"mp4v"),
-                fps,
-                (int(width), int(height)),
-            )
+            # Already move to main.py
+            # video_writer = cv2.VideoWriter(
+            #     save_path,
+            #     cv2.VideoWriter_fourcc(*"mp4v"),
+            #     fps,
+            #     (int(width), int(height)),
+            # )
 
         frame_id = 1
         tic = time.time()
@@ -269,9 +271,12 @@ class ASOne:
 
         while True:
             start_time = time.time()
-            for i in range(int(cap.get(cv2.CAP_PROP_FPS))):
+            for i in range(24):
+                print("cap.read(), fps = ",int(fps))
                 ret, frame = cap.read()
+                print("ret = ",ret)
             if not ret:
+                print("not ret")
                 break
             im0 = copy.deepcopy(frame)
 
@@ -300,13 +305,6 @@ class ASOne:
             currTime = time.time()
             fps = 1 / (currTime - prevTime)
             prevTime = currTime
-            nMale = 0
-            nFemale = 0
-            for i in class_ids:
-                if (class_ids[i]==0):
-                    nMale = nMale + 1
-                else:
-                    nFemale = nFemale + 1
             ## Put screen text
             cv2.line(im0, (20, 25), (127, 25), [85, 45, 255], 30)
             cv2.putText(im0, f'FPS: {int(fps)}', (11, 35), 0, 1, [
@@ -320,8 +318,8 @@ class ASOne:
 
             # if display:
             #     cv2.imshow(' Sample', im0)
-            if save_result:
-                video_writer.write(im0)
+            # if save_result:
+            #     video_writer.write(im0)
 
             frame_id += 1
 
@@ -330,7 +328,7 @@ class ASOne:
 
             # yeild required values in form of (bbox_details, frames_details)
             print("before yield")
-            yield (bboxes_xyxy, ids, scores, class_ids), (im0 if display else frame, frame_id-1, fps)
+            yield (bboxes_xyxy, ids, scores, class_ids), (im0 if display else frame, frame_id-1, fps,  width, height, save_path)
 
         tac = time.time()
         print(f'Total Time Taken: {tac - tic:.2f}')
@@ -342,3 +340,4 @@ if __name__ == '__main__':
 
     asone.start_tracking('data/sample_videos/video2.mp4',
                          save_result=True, display=False)
+    
