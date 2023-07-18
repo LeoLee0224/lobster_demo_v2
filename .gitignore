@@ -6,4 +6,3 @@ runs
 /yolov7
 /yolov8
 *.pyc
-__pycache__
