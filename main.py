@@ -9,6 +9,7 @@ import sys
 import asone
 from asone import ASOne
 from match import Match
+import asone.utils as utils
 
 class ObjectDetection:
 
@@ -76,6 +77,23 @@ class ObjectDetection:
             print("finished call track2 data")
             match_result = self.match.match_detections()
             print("match_result = ",match_result)
+            print("write boxese")
+            #print scores class_ids and ids
+            frame1 = utils.draw_boxes(frame1,
+                                bbox_xyxy1,
+                                class_ids1,
+                                identities=ids1,
+                                draw_trails=False,
+                                class_names=self.CLASS_NAMES_DICT1,
+                                score=scores1)
+            
+            frame2 = utils.draw_boxes(frame2,
+                                bbox_xyxy2,
+                                finalclass2,
+                                identities=ids2,
+                                draw_trails=False,
+                                class_names=self.CLASS_NAMES_DICT2,
+                                score=scores2)
             nMale = 0
             nFemale = 0
             nUndefine = 0

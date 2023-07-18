@@ -3,5 +3,5 @@ python_modules
 .pyenv
 runs
 .menv
-yolov7
-yolov8
+/yolov7
+/yolov8

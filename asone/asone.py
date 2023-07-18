@@ -272,9 +272,9 @@ class ASOne:
         while True:
             start_time = time.time()
             for i in range(24):
-                print("cap.read(), fps = ",int(fps))
+                #print("cap.read(), fps = ",int(fps))
                 ret, frame = cap.read()
-                print("ret = ",ret)
+                #print("ret = ",ret)
             if not ret:
                 print("not ret")
                 break
@@ -288,19 +288,21 @@ class ASOne:
                 'frame {}/{} ({:.2f} ms)'.format(frame_id, int(frame_count),
                                                  elapsed_time * 1000))
 
-            if self.recognizer:
-                res = self.recognizer.recognize(im0, horizontal_list=bboxes_xyxy,
-                            free_list=[])
-                im0 = utils.draw_text(im0, res)
-            else:
-                #print scores class_ids and ids
-                im0 = utils.draw_boxes(im0,
-                                    bboxes_xyxy,
-                                    class_ids,
-                                    identities=ids,
-                                    draw_trails=draw_trails,
-                                    class_names=class_names,
-                                    score=scores)
+            # if self.recognizer:
+            #     res = self.recognizer.recognize(im0, horizontal_list=bboxes_xyxy,
+            #                 free_list=[])
+            #     im0 = utils.draw_text(im0, res)
+            # else:
+            #     print("write boxese")
+            #     # Already move to main.py
+            #     #print scores class_ids and ids
+            #     im0 = utils.draw_boxes(im0,
+            #                         bboxes_xyxy,
+            #                         class_ids,
+            #                         identities=ids,
+            #                         draw_trails=draw_trails,
+            #                         class_names=class_names,
+            #                         score=scores)
 
             currTime = time.time()
             fps = 1 / (currTime - prevTime)
