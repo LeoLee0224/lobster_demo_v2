@@ -86,7 +86,7 @@ class ObjectDetection:
                                 draw_trails=False,
                                 class_names=self.CLASS_NAMES_DICT1,
                                 score=scores1)
-            
+            finalclass2 = self.match.changeclass(ids2,class_ids2)
             frame2 = utils.draw_boxes(frame2,
                                 bbox_xyxy2,
                                 finalclass2,

@@ -13,6 +13,8 @@ class Match:
         self.detections_b = {}
         self.lobster_detections = {}
         self.matched_detections = []
+        self.tempclass = {}
+        self.finalclass = None
 
     def add_detection_a(self,bbox,class_id,score,frame,id):
         detections = {
@@ -62,3 +64,17 @@ class Match:
                 }
                 self.matched_detections.append(matched_detection)
         return self.matched_detections
+    
+    def changeclass(self,ids,class_ids):
+        if (str(ids) not in self.tempclass):
+            self.tempclass[str(ids)] = [class_ids]
+            print("start record tempclass",str(ids))
+        else:
+            self.tempclass[str(ids)].append(class_ids)
+        if (len(self.tempclass[str(ids)])<3):
+            self.finalclass = self.tempclass[str(ids)][0]
+        else:
+            length = len(self.tempclass[str(ids)])
+            if (self.tempclass[str(ids)][length-1]==self.tempclass[str(ids)][length-2]==self.tempclass[str(ids)][length-3]):
+                self.finalclass = self.tempclass[str(ids)][length-1]
+        return self.finalclass
