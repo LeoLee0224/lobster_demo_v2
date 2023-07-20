@@ -77,6 +77,24 @@ class ObjectDetection:
             print("finished call track2 data")
             match_result = self.match.match_detections()
             print("match_result = ",match_result)
+            matchClass, matchids, matchScore = self.match.dictToList(match_result)
+            matchBBox = []
+            matchOriScore = []
+            for i in range(len(matchClass)):
+                if matchids[i] in ids1:
+                    listIndex = ids1.index(matchids[i])
+                    class_ids1.pop(listIndex)
+                    ids1.pop(listIndex)
+                    matchBBox.append(bbox_xyxy1.pop(listIndex))
+                    matchOriScore.append(scores1.pop(listIndex))
+                    print("ori pop finished")
+                else:
+                    matchClass.pop(i)
+                    matchids.pop(i)
+                    matchScore.pop(i)
+                    print("match pop finished")
+            for i in range(len(matchScore)):
+                matchScore[i] = (matchScore[i]+matchOriScore[i])/2
             print("write boxese")
             #print scores class_ids and ids
             frame1 = utils.draw_boxes(frame1,
@@ -86,7 +104,16 @@ class ObjectDetection:
                                 draw_trails=False,
                                 class_names=self.CLASS_NAMES_DICT1,
                                 score=scores1)
+            if len(matchids) != 0:
+                frame1 = utils.draw_boxes(frame1,
+                                    matchBBox,
+                                    matchClass,
+                                    identities=matchids,
+                                    draw_trails=False,
+                                    class_names=self.CLASS_NAMES_DICT2,
+                                    score=matchScore)
             finalclass2 = self.match.changeclass(ids2,class_ids2)
+            #finalclass2 = class_ids2
             frame2 = utils.draw_boxes(frame2,
                                 bbox_xyxy2,
                                 finalclass2,
@@ -97,43 +124,43 @@ class ObjectDetection:
             nMale = 0
             nFemale = 0
             nUndefine = 0
-            for i in range(len(class_ids2)):
-                if (class_ids2[i]==1):
+            for i in range(len(matchClass)):
+                if (matchClass[i]==1):
                     nMale = nMale + 1
-                elif(class_ids2[i]==0):
+                elif(matchClass[i]==0):
                     nFemale = nFemale + 1
                 else:
                     nUndefine = nUndefine + 1
-            cv2.putText(frame1, f'Total: {int(len(ids1))}', (60, 800),
+            cv2.putText(frame1, f'Total: {int(len(ids1)+len(matchids))}', (60, int(height1-((height1/20)*4))),
                     cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 255, 0), 2)
-            cv2.putText(frame1, f'Male: {int(nMale)}', (60, 900),
+            cv2.putText(frame1, f'Male: {int(nMale)}', (60, int(height1-(height1/20)*3)),
                     cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 255, 0), 2)
-            cv2.putText(frame1, f'Female: {int(nFemale)}', (60, 1000),
+            cv2.putText(frame1, f'Female: {int(nFemale)}', (60, int(height1-(height1/20)*2)),
                     cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 255, 0), 2)
-            cv2.putText(frame1, f'Undefine: {int(nUndefine)}', (60, 1200),
+            cv2.putText(frame1, f'Undefine: {int(nUndefine)}', (60, int(height1-(height1/20))),
                     cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 255, 0), 2)
 
-            cv2.putText(frame2, f'Total: {int(len(ids1))}', (60, 800),
+            cv2.putText(frame2, f'Total: {int(len(ids1)+len(matchids))}', (60, int(height2-(height2/20)*4)),
                     cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 255, 0), 2)
-            cv2.putText(frame2, f'Male: {int(nMale)}', (60, 900),
+            cv2.putText(frame2, f'Male: {int(nMale)}', (60, int(height2-(height2/20)*3)),
                     cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 255, 0), 2)
-            cv2.putText(frame2, f'Female: {int(nFemale)}', (60, 1000),
+            cv2.putText(frame2, f'Female: {int(nFemale)}', (60, int(height2-(height2/20)*2)),
                     cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 255, 0), 2)
-            cv2.putText(frame2, f'Undefine: {int(nUndefine)}', (60, 1200),
+            cv2.putText(frame2, f'Undefine: {int(nUndefine)}', (60, int(height2-(height2/20))),
                     cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 255, 0), 2)
             #if display:
             cv2.imshow(cam1, frame1)          
             cv2.imshow(cam2, frame2)          
             cv2.VideoWriter(
                 save_path1,
-                cv2.VideoWriter_fourcc(*"mp4v"),
-                fps1,
+                cv2.VideoWriter_fourcc(*"avc1"),
+                24.0,
                 (int(width1), int(height1)),
             ).write(frame1)
             cv2.VideoWriter(
                 save_path2,
-                cv2.VideoWriter_fourcc(*"mp4v"),
-                fps2,
+                cv2.VideoWriter_fourcc(*"avc1"),
+                24.0,
                 (int(width2), int(height2)),
             ).write(frame2)
             # Do anything with bboxes here
