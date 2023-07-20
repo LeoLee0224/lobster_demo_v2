@@ -12,13 +12,13 @@ def compute_color_for_labels(label):
     Simple function that adds fixed color depending on the class
     """
     if label == 0:  # person  #BGR
-        color = (85, 45, 255)
-    elif label == 2:  # Car
-        color = (222, 82, 175)
+        color = (0, 0, 255)
+    elif label == 1:  # Car
+        color = (200, 50, 50)
     elif label == 3:  # Motobike
-        color = (0, 204, 255)
-    elif label == 5:  # Bus
-        color = (0, 149, 255)
+        color = (34, 139, 34)
+    elif label == 2:  # Bus
+        color = (226, 43, 138)
     else:
         color = [int((p * (label ** 2 - label + 1)) % 255) for p in palette]
     return tuple(color)

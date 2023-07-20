@@ -90,8 +90,8 @@ def draw_boxes(img, bbox_xyxy, class_ids, identities=None, draw_trails=False, of
             obj_name = names[int(class_ids[i])]
         
         #label = f'{obj_name}' if id is None else f'{id}'
-        pscore = str(round(score[i],2))
-        print("print score = ", pscore)
+        # pscore = str(round(score[i],2))
+        # print("print score = ", pscore)
         label = f'{obj_name}' if id is None else f'{obj_name}{id}' if score is None else f'{obj_name} {id} {pscore}'
 
         draw_ui_box(box, img, label=label, color=color, line_thickness=2)

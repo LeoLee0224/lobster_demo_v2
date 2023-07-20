@@ -52,7 +52,7 @@ class ObjectDetection:
         cam2 = "Camera2"
         cv2.namedWindow(cam1)
         cv2.namedWindow(cam2)
-
+        self.CLASS_NAMES_DICT1 = {3:self.CLASS_NAMES_DICT1[0]}
         track1 = detect1.track_video(self.capture_index1, output_dir='runs/detect1', save_result=True, 
                                    display=True, filter_classes=filter_classes, 
                                    draw_trails = False, class_names = self.CLASS_NAMES_DICT1)
@@ -64,6 +64,7 @@ class ObjectDetection:
         #bbox_details2, frame_details2 = track2
         # Loop over track to retrieve outputs of each frame 
         print("going")
+        a = 0
         for bbox_details1, frame_details1 in track1:
             print("start for loop")
             bbox_xyxy1, ids1, scores1, class_ids1 = bbox_details1
@@ -80,6 +81,8 @@ class ObjectDetection:
             matchClass, matchids, matchScore = self.match.dictToList(match_result)
             matchBBox = []
             matchOriScore = []
+            for i in range(len(class_ids1)):
+                class_ids1[i] = class_ids1[i]+3
             for i in range(len(matchClass)):
                 if matchids[i] in ids1:
                     listIndex = ids1.index(matchids[i])
@@ -102,16 +105,14 @@ class ObjectDetection:
                                 class_ids1,
                                 identities=ids1,
                                 draw_trails=False,
-                                class_names=self.CLASS_NAMES_DICT1,
-                                score=scores1)
+                                class_names=self.CLASS_NAMES_DICT1)
             if len(matchids) != 0:
                 frame1 = utils.draw_boxes(frame1,
                                     matchBBox,
                                     matchClass,
                                     identities=matchids,
                                     draw_trails=False,
-                                    class_names=self.CLASS_NAMES_DICT2,
-                                    score=matchScore)
+                                    class_names=self.CLASS_NAMES_DICT2)
             finalclass2 = self.match.changeclass(ids2,class_ids2)
             #finalclass2 = class_ids2
             frame2 = utils.draw_boxes(frame2,
@@ -119,8 +120,7 @@ class ObjectDetection:
                                 finalclass2,
                                 identities=ids2,
                                 draw_trails=False,
-                                class_names=self.CLASS_NAMES_DICT2,
-                                score=scores2)
+                                class_names=self.CLASS_NAMES_DICT2)
             nMale = 0
             nFemale = 0
             nUndefine = 0
@@ -131,38 +131,45 @@ class ObjectDetection:
                     nFemale = nFemale + 1
                 else:
                     nUndefine = nUndefine + 1
-            cv2.putText(frame1, f'Total: {int(len(ids1)+len(matchids))}', (60, int(height1-((height1/20)*4))),
-                    cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 255, 0), 2)
-            cv2.putText(frame1, f'Male: {int(nMale)}', (60, int(height1-(height1/20)*3)),
-                    cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 255, 0), 2)
-            cv2.putText(frame1, f'Female: {int(nFemale)}', (60, int(height1-(height1/20)*2)),
-                    cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 255, 0), 2)
-            cv2.putText(frame1, f'Undefine: {int(nUndefine)}', (60, int(height1-(height1/20))),
-                    cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 255, 0), 2)
-
-            cv2.putText(frame2, f'Total: {int(len(ids1)+len(matchids))}', (60, int(height2-(height2/20)*4)),
-                    cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 255, 0), 2)
-            cv2.putText(frame2, f'Male: {int(nMale)}', (60, int(height2-(height2/20)*3)),
-                    cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 255, 0), 2)
-            cv2.putText(frame2, f'Female: {int(nFemale)}', (60, int(height2-(height2/20)*2)),
-                    cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 255, 0), 2)
-            cv2.putText(frame2, f'Undefine: {int(nUndefine)}', (60, int(height2-(height2/20))),
-                    cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 255, 0), 2)
+            cv2.line(frame1, (140,int(height1-((height1/20)*5.3))), (360,int(height1-((height1/20)*5.3))), (255, 255, 255), 4)
+            cv2.putText(frame1, f'Detail', (160, int(height1-((height1/20)*5.5))),
+                    cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 5)
+            cv2.putText(frame1, f'Total: {int(len(ids1)+len(matchids))}', (60, int(height1-((height1/20)))),
+                    cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 5)
+            cv2.putText(frame1, f'Male: {int(nMale)}', (60, int(height1-(height1/20)*4)),
+                    cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 100, 100), 5)
+            cv2.putText(frame1, f'Female: {int(nFemale)}', (60, int(height1-(height1/20)*3)),
+                    cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 5)
+            cv2.putText(frame1, f'Undefine: {int(nUndefine)}', (60, int(height1-(height1/20)*2)),
+                    cv2.FONT_HERSHEY_SIMPLEX, 2, (250, 112, 250), 5)
+            
+            cv2.line(frame2, (140,int(height2-((height2/20)*5.3))), (360,int(height2-((height2/20)*5.3))), (255, 255, 255), 4)
+            cv2.putText(frame2, f'Detail', (160, int(height2-(height2/20)*5.5)),
+                    cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 5)
+            cv2.putText(frame2, f'Total: {int(len(ids1)+len(matchids))}', (60, int(height2-(height2/20))),
+                    cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 5)
+            cv2.putText(frame2, f'Male: {int(nMale)}', (60, int(height2-(height2/20)*4)),
+                    cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 100, 100), 5)
+            cv2.putText(frame2, f'Female: {int(nFemale)}', (60, int(height2-(height2/20)*3)),
+                    cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 5)
+            cv2.putText(frame2, f'Undefine: {int(nUndefine)}', (60, int(height2-(height2/20)*2)),
+                    cv2.FONT_HERSHEY_SIMPLEX, 2, (250, 112, 250), 5)
             #if display:
             cv2.imshow(cam1, frame1)          
-            cv2.imshow(cam2, frame2)          
-            cv2.VideoWriter(
-                save_path1,
-                cv2.VideoWriter_fourcc(*"avc1"),
-                24.0,
-                (int(width1), int(height1)),
-            ).write(frame1)
-            cv2.VideoWriter(
-                save_path2,
-                cv2.VideoWriter_fourcc(*"avc1"),
-                24.0,
-                (int(width2), int(height2)),
-            ).write(frame2)
+            cv2.imshow(cam2, frame2)
+            if a == 0:
+                videowriter1 = cv2.VideoWriter(
+                    save_path1,
+                    cv2.VideoWriter_fourcc(*"avc1"),
+                    24.0,
+                    (int(width1), int(height1)))
+                videowriter2 = cv2.VideoWriter(
+                    save_path2,
+                    cv2.VideoWriter_fourcc(*"avc1"),
+                    24.0,
+                    (int(width2), int(height2)))
+            videowriter1.write(frame1)
+            videowriter2.write(frame2)
             # Do anything with bboxes here
             print("ids1 = ",ids1)
             print("scores1 = ",scores1)
@@ -176,6 +183,7 @@ class ObjectDetection:
             print("frame2 = ",frame2)
             print("frame_num2 = ",frame_num2)
             print("fps2 = ",fps2)
+            a = a + 1
 
         cv2.destroyWindow(cam1)
         cv2.destroyWindow(cam2)

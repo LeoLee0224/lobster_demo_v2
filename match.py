@@ -120,7 +120,7 @@ class Match:
             if (len(self.tempclass[str(ids)])<3):
                 finalclass.append(self.tempclass[str(ids)][0])
             else:
-                if (len(self.tempclass[str(ids)])>50):
+                if (len(self.tempclass[str(ids)])>5):
                     self.tempclass[str(ids)].pop(0)
                 mode = stat.mode(self.tempclass[str(ids)])
                 finalclass.append(mode)
