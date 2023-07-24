@@ -72,6 +72,28 @@ class Match:
                 idsList.append(value["number_detection"]["id"])
                 scoreList.append(value["number_detection"]["score"])
         return classList,idsList,scoreList
+    
+    def confidenceAndEdit(self, bbox, classID, score, ids, confidenceLevel):
+        edit = True
+        while edit:
+            if len(classID) > len(ids):
+                classID.pop()
+            else:
+                edit = False
+        if len(score) != 0:
+            leng = len(score)
+            i = 0
+            while i < leng:
+                if score[i]<confidenceLevel:
+                    bbox.pop(i)
+                    score.pop(i)
+                    classID.pop(i)
+                    ids.pop(i)
+                    i = i - 1
+                    leng = leng - 1
+                i = i + 1
+        return bbox, score, classID, ids
+
 
 
     # Define a function to match detections from Model A and Model B
@@ -79,6 +101,18 @@ class Match:
         # Initialize a dictionary to store the detections for each lobster
         # Loop over the detections from Model A
         # Add the detection to the dictionary for the corresponding lobster
+        popValue = []
+        for key, value in self.lobster_detections.items():
+            notin = False
+            for i in range(len(self.detections_a)):
+                if int(key) == self.detections_a[i]["id"]:
+                    notin = True
+                    break
+            if notin == False:
+                popValue.append(key)
+        if len(popValue) != 0:
+            for i in range(len(popValue)):
+                self.lobster_detections.pop(popValue[i])
         for i in range(len(self.detections_a)):
             lobster_id = self.detections_a[i]['id']
             self.add_lobster_detections(lobster_id,"number_detection",self.detections_a[i])
@@ -89,7 +123,7 @@ class Match:
             lobster_id = self.detections_b[i]['id']
             for key, value in self.lobster_detections.items():
                 if value["sex_detection"] == None and lobster_id not in self.usedTrack:
-                    if value["waitCount"]<=3:
+                    if value["waitCount"]<=1:
                         self.add_lobster_detections(key,"waitCount",value["waitCount"]+1)
                         self.waitclass.append(self.detections_b[i]['class'])
                         break

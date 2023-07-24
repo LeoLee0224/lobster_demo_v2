@@ -271,9 +271,9 @@ class ASOne:
 
         while True:
             start_time = time.time()
-            #for i in range(24):
+            for i in range(24):
                 #print("cap.read(), fps = ",int(fps))
-            ret, frame = cap.read()
+                ret, frame = cap.read()
                 #print("ret = ",ret)
             if not ret:
                 print("not ret")

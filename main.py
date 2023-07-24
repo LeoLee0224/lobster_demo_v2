@@ -69,11 +69,13 @@ class ObjectDetection:
             print("start for loop")
             bbox_xyxy1, ids1, scores1, class_ids1 = bbox_details1
             frame1, frame_num1, fps1, width1, height1, save_path1 = frame_details1
+            self.match.confidenceAndEdit(bbox_xyxy1,class_ids1,scores1,ids1,0.7)
             self.match.add_detection_a(bbox_xyxy1,class_ids1,scores1,frame_num1,ids1)
             print("finished call track1 data")
             bbox_details2, frame_details2 = next(track2)
             bbox_xyxy2, ids2, scores2, class_ids2 = bbox_details2
             frame2, frame_num2, fps2, width2, height2, save_path2 = frame_details2
+            self.match.confidenceAndEdit(bbox_xyxy2,class_ids2,scores2,ids2,0.7)
             self.match.add_detection_b(bbox_xyxy2,class_ids2,scores2,frame_num2,ids2)
             print("finished call track2 data")
             match_result = self.match.match_detections()
@@ -83,7 +85,9 @@ class ObjectDetection:
             matchOriScore = []
             for i in range(len(class_ids1)):
                 class_ids1[i] = class_ids1[i]+3
-            for i in range(len(matchClass)):
+            leng = len(matchids)
+            i = 0
+            while i < leng:
                 if matchids[i] in ids1:
                     listIndex = ids1.index(matchids[i])
                     class_ids1.pop(listIndex)
@@ -95,7 +99,10 @@ class ObjectDetection:
                     matchClass.pop(i)
                     matchids.pop(i)
                     matchScore.pop(i)
+                    i = i - 1
+                    leng = leng - 1
                     print("match pop finished")
+                i = i + 1
             for i in range(len(matchScore)):
                 matchScore[i] = (matchScore[i]+matchOriScore[i])/2
             print("write boxese")
@@ -113,14 +120,15 @@ class ObjectDetection:
                                     identities=matchids,
                                     draw_trails=False,
                                     class_names=self.CLASS_NAMES_DICT2)
-            finalclass2 = self.match.changeclass(ids2,class_ids2)
-            #finalclass2 = class_ids2
+            #finalclass2 = self.match.changeclass(ids2,class_ids2)
+            finalclass2 = class_ids2
             frame2 = utils.draw_boxes(frame2,
                                 bbox_xyxy2,
                                 finalclass2,
                                 identities=ids2,
                                 draw_trails=False,
-                                class_names=self.CLASS_NAMES_DICT2)
+                                class_names=self.CLASS_NAMES_DICT2,
+                                score=scores2)
             nMale = 0
             nFemale = 0
             nUndefine = 0
@@ -161,12 +169,12 @@ class ObjectDetection:
                 videowriter1 = cv2.VideoWriter(
                     save_path1,
                     cv2.VideoWriter_fourcc(*"avc1"),
-                    24.0,
+                    1.0,
                     (int(width1), int(height1)))
                 videowriter2 = cv2.VideoWriter(
                     save_path2,
                     cv2.VideoWriter_fourcc(*"avc1"),
-                    24.0,
+                    1.0,
                     (int(width2), int(height2)))
             videowriter1.write(frame1)
             videowriter2.write(frame2)
@@ -189,15 +197,15 @@ class ObjectDetection:
         cv2.destroyWindow(cam2)
 
 
-detector = ObjectDetection("./assets/cam1_demo3.mp4","./assets/cam2_demo3.mp4")
-detector()
+# detector = ObjectDetection("./assets/cam1_demo3.mp4","./assets/cam2_demo3.mp4")
+# detector()
 
 # detector = ObjectDetection(0,0)
 # detector()
 
 #capture data from CCTV
-# rstp_url = ['rtsp://admin:pp123123@192.168.8.38:554/Streaming/channels/401',
-#             'rtsp://admin:pp123123@192.168.8.38:554/Streaming/channels/201', 'http://admin:pp123123@192.168.8.38/Streaming/channels/102/httppreview']
+rstp_url = ['rtsp://admin:pp123123@192.168.8.47:554/Streaming/channels/201',
+            'rtsp://admin:pp123123@192.168.8.47:554/Streaming/channels/101', 'http://admin:pp123123@192.168.8.38/Streaming/channels/102/httppreview']
 
-# detector = ObjectDetection(rstp_url[1],rstp_url[0])
-# detector()
+detector = ObjectDetection(rstp_url[1],rstp_url[0])
+detector()
