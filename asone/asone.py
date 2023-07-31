@@ -232,6 +232,10 @@ class ASOne:
         if not self.tracker:
             print(f'No tracker is selected. use detect() function perform detcetion or pass a tracker.')
             exit()
+        # else:
+        #     print("self.tracker = ",self.tracker)
+        #     self.tracker = copy.deepcopy(self.tracker)
+        #     print("self.tracker2 = ",self.tracker)
         print("start config.pop")
         fps = config.pop('fps')
         output_dir = config.pop('output_dir')

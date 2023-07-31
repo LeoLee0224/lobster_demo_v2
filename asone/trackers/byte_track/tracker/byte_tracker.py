@@ -2,6 +2,7 @@ import numpy as np
 from .kalman_filter import KalmanFilter
 from asone.trackers.byte_track.tracker import matching
 from .basetrack import BaseTrack, TrackState
+import os
 
 class STrack(BaseTrack):
     shared_kalman = KalmanFilter()
@@ -153,6 +154,10 @@ class BYTETracker(object):
         self.kalman_filter = KalmanFilter()
 
     def update(self, output_results, img_info, img_size):
+        path = "log.txt"
+        tfile = open(path,"a")
+        print("helloworld",file=tfile)
+        print("update is start, output = ", output_results,"img_info = ", img_info, "img_size = ", img_size, file=tfile)
         self.frame_id += 1
         activated_starcks = []
         refind_stracks = []
@@ -160,9 +165,12 @@ class BYTETracker(object):
         removed_stracks = []
 
         if output_results.shape[1] == 5:
+            print("output_results.shpae[1] == 5", file=tfile)
             scores = output_results[:, 4]
             bboxes = output_results[:, :4]
+            print("scores = ", scores, "bboxes = ",bboxes, file=tfile)
         else:
+            print("output_results.shpae[1] != 5", file=tfile)
             output_results = output_results.cpu().numpy()
             scores = output_results[:, 4] * output_results[:, 5]
             bboxes = output_results[:, :4]  # x1y1x2y2
@@ -171,10 +179,15 @@ class BYTETracker(object):
         bboxes /= scale
 
         remain_inds = scores > self.track_thresh
+        print("self.track_thresh = ", self.track_thresh, file=tfile)
+        print("remain_ids = ", remain_inds, file=tfile)
         inds_low = scores > 0.1
         inds_high = scores < self.track_thresh
+        print("inds_low = ", inds_low, file=tfile)
+        print("inds_high = ", inds_high, file=tfile)
 
         inds_second = np.logical_and(inds_low, inds_high)
+        print("inds_second = ", inds_second, file=tfile)
         dets_second = bboxes[inds_second]
         dets = bboxes[remain_inds]
         scores_keep = scores[remain_inds]
@@ -184,6 +197,7 @@ class BYTETracker(object):
             '''Detections'''
             detections = [STrack(STrack.tlbr_to_tlwh(tlbr), s) for
                           (tlbr, s) in zip(dets, scores_keep)]
+            print("detections = ",detections, file=tfile)
         else:
             detections = []
 
@@ -281,7 +295,8 @@ class BYTETracker(object):
         self.tracked_stracks, self.lost_stracks = remove_duplicate_stracks(self.tracked_stracks, self.lost_stracks)
         # get scores of lost tracks
         output_stracks = [track for track in self.tracked_stracks if track.is_activated]
-
+        print("output_stracks = ", output_stracks, file=tfile)
+        tfile.close()
         return output_stracks
 
 

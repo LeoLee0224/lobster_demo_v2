@@ -12,7 +12,7 @@ def compute_color_for_labels(label):
     Simple function that adds fixed color depending on the class
     """
     if label == 0:  # person  #BGR
-        color = (0, 0, 255)
+        color = (0, 150, 0)
     elif label == 1:  # Car
         color = (200, 50, 50)
     elif label == 3:  # Motobike
