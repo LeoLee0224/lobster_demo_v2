@@ -10,6 +10,7 @@ import asone
 from asone import ASOne
 #from match import Match
 import asone.utils as utils
+from detect import Detect
 
 class ObjectDetection:
 
@@ -175,21 +176,50 @@ class ObjectDetection:
                     cv2.VideoWriter_fourcc(*"avc1"),
                     1.0,
                     (int(width2), int(height2)))
+
             videowriter1.write(frame1)
             videowriter2.write(frame2)
+            path = "mainlog.txt"
+            tfile = open(path,"a")
+            magnifier = 100
+            dead1 = Detect.detecting(bbox_xyxy1, 3, 5)
+            dead2 = Detect.detecting(bbox_xyxy2, 3, 5)
+            framehig1, framewid1, _ = frame1.shape
+            framehig2, framewid2, _ = frame2.shape
+            print("framehig1 = ",framehig1, "framewid = ", framewid1)
+            if dead1 != []:
+                print("pop list in dead1",file=tfile)
+                for i in range(len(dead1)):
+                    for j in range(len(bbox_xyxy1)):
+                        if Detect.bias(bbox_xyxy1[j],dead1[i]["xyxy"]):
+                            print("bbox = ",bbox_xyxy1[j],"track_id = ",ids1[j],"finished printing",file=tfile)
+                            crop_image1 = Detect.bboxcrop(frame1,bbox_xyxy1[j],framewid1,framehig1,magnifier)
+                            img_name1 = "runs/detect3/output"+str(frame_num1)+"_"+str(i)+".jpg"
+                            cv2.imwrite(img_name1,crop_image1)
+                            
+            if dead2 != []:
+                print("pop list in dead2",file=tfile)
+                for i in range(len(dead2)):
+                    for j in range(len(bbox_xyxy2)):
+                        if Detect.bias(bbox_xyxy2[j],dead2[i]["xyxy"]):
+                            print("bbox = ",bbox_xyxy2[j],"track_id = ",ids2[j],"finished printing",file=tfile)
+                            crop_image2 = Detect.bboxcrop(frame2,bbox_xyxy2[j],framewid2,framehig2,magnifier)
+                            img_name2 = "runs/detect4/output"+str(frame_num2)+"_"+str(i)+".jpg"
+                            cv2.imwrite(img_name2,crop_image2)
+
+            tfile.close()
             # Do anything with bboxes here
             print("ids1 = ",ids1)
             print("scores1 = ",scores1)
             print("class_ids1 = ",class_ids1)
-            print("frame1 = ",frame1)
             print("frame_num1 = ",frame_num1)
             print("fps1 = ",fps1)
             print("ids2 = ",ids2)
             print("scores2 = ",scores2)
             print("class_ids2 = ",class_ids2)
-            print("frame2 = ",frame2)
             print("frame_num2 = ",frame_num2)
             print("fps2 = ",fps2)
+            print("save_path1 = ",save_path1)
             a = a + 1
 
         cv2.destroyWindow(cam1)
