@@ -226,7 +226,7 @@ class ObjectDetection:
                                 draw_trails=False,
                                 class_names=self.CLASS_NAMES_DICT1)
                             print("bbox = ",bbox_xyxy2[j],"track_id = ",ids2[j],file=tfile)
-                            crop_image2 = Detect.bboxcrop(frame2,bbox_xyxy2[j],framewid2,framehig2,magnifier)
+                            crop_image2 = Detect.bboxcrop(cleanframe2,bbox_xyxy2[j],framewid2,framehig2,magnifier)
                             img_name2 = "runs/detect4/output"+str(frame_num2)+"_"+str(i)+".jpg"
                             cv2.imwrite(img_name2,crop_image2)
                             full_img_name2 = "runs/detect4/fulloutput"+str(frame_num1)+"_"+str(i)+".jpg"
