@@ -11,6 +11,7 @@ from asone import ASOne
 #from match import Match
 import asone.utils as utils
 from detect import Detect
+import copy
 
 class ObjectDetection:
 
@@ -44,6 +45,8 @@ class ObjectDetection:
         detect1 = ASOne(tracker=asone.BYTETRACK, detector=asone.YOLOV8M_PYTORCH, use_cuda=False) #set use_cuda=False to use cpu
         detect2 = ASOne(tracker=asone.BYTETRACK, detector=asone.YOLOV8M_PYTORCH, use_cuda=False)
         filter_classes = None # set to None to track all classes
+        die1 = Detect()
+        die2 = Detect()
 
         # ##############################################
         #           To track using video file
@@ -107,6 +110,8 @@ class ObjectDetection:
             #     matchScore[i] = (matchScore[i]+matchOriScore[i])/2
             print("write boxese")
             #print scores class_ids and ids
+            cleanframe1 = copy.deepcopy(frame1)
+            cleanframe2 = copy.deepcopy(frame2)
             frame1 = utils.draw_boxes(frame1,
                                 bbox_xyxy1,
                                 class_ids1,
@@ -182,30 +187,50 @@ class ObjectDetection:
             path = "mainlog.txt"
             tfile = open(path,"a")
             magnifier = 100
-            dead1 = Detect.detecting(bbox_xyxy1, 3, 5)
-            dead2 = Detect.detecting(bbox_xyxy2, 3, 5)
+            dead1 = die1.detecting(bbox_xyxy1, 3, 5)
+            dead2 = die2.detecting(bbox_xyxy2, 3, 5)
             framehig1, framewid1, _ = frame1.shape
             framehig2, framewid2, _ = frame2.shape
             print("framehig1 = ",framehig1, "framewid = ", framewid1)
             if dead1 != []:
+                print("---------",file=tfile)
+                print("---------",file=tfile)
                 print("pop list in dead1",file=tfile)
                 for i in range(len(dead1)):
                     for j in range(len(bbox_xyxy1)):
-                        if Detect.bias(bbox_xyxy1[j],dead1[i]["xyxy"]):
-                            print("bbox = ",bbox_xyxy1[j],"track_id = ",ids1[j],"finished printing",file=tfile)
-                            crop_image1 = Detect.bboxcrop(frame1,bbox_xyxy1[j],framewid1,framehig1,magnifier)
+                        if die1.bias(bbox_xyxy1[j],dead1[i]["xyxy"]):
+                            cleanframe1 = utils.draw_boxes(cleanframe1,
+                                [bbox_xyxy1[j]],
+                                [class_ids1[j]],
+                                identities=[ids1[j]],
+                                draw_trails=False,
+                                class_names=self.CLASS_NAMES_DICT1)
+                            print("bbox = ",bbox_xyxy1[j],"track_id = ",ids1[j],file=tfile)
+                            crop_image1 = Detect.bboxcrop(cleanframe1,bbox_xyxy1[j],framewid1,framehig1,magnifier)
                             img_name1 = "runs/detect3/output"+str(frame_num1)+"_"+str(i)+".jpg"
                             cv2.imwrite(img_name1,crop_image1)
-                            
+                            full_img_name1 = "runs/detect3/fulloutput"+str(frame_num1)+"_"+str(i)+".jpg"
+                            cv2.imwrite(full_img_name1,cleanframe1)
+
             if dead2 != []:
+                print("---------",file=tfile)
+                print("---------",file=tfile)
                 print("pop list in dead2",file=tfile)
                 for i in range(len(dead2)):
                     for j in range(len(bbox_xyxy2)):
-                        if Detect.bias(bbox_xyxy2[j],dead2[i]["xyxy"]):
-                            print("bbox = ",bbox_xyxy2[j],"track_id = ",ids2[j],"finished printing",file=tfile)
+                        if die2.bias(bbox_xyxy2[j],dead2[i]["xyxy"]):
+                            cleanframe2 = utils.draw_boxes(cleanframe2,
+                                [bbox_xyxy2[j]],
+                                [class_ids2[j]],
+                                identities=[ids2[j]],
+                                draw_trails=False,
+                                class_names=self.CLASS_NAMES_DICT1)
+                            print("bbox = ",bbox_xyxy2[j],"track_id = ",ids2[j],file=tfile)
                             crop_image2 = Detect.bboxcrop(frame2,bbox_xyxy2[j],framewid2,framehig2,magnifier)
                             img_name2 = "runs/detect4/output"+str(frame_num2)+"_"+str(i)+".jpg"
                             cv2.imwrite(img_name2,crop_image2)
+                            full_img_name2 = "runs/detect4/fulloutput"+str(frame_num1)+"_"+str(i)+".jpg"
+                            cv2.imwrite(full_img_name2,cleanframe2)
 
             tfile.close()
             # Do anything with bboxes here
