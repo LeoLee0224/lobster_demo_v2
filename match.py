@@ -29,7 +29,7 @@ class Match:
                 "id": array_id[i]
             }
             self.detections_a.append(detections)
-        print("detection_A = ", self.detections_a)
+        #print("detection_A = ", self.detections_a)
 
     def add_detection_b(self,array_bbox, array_class_id, array_score, frame, array_id):
         self.detections_b.clear()
@@ -42,7 +42,7 @@ class Match:
                 "id": array_id[i]
             }
             self.detections_b.append(detections)
-        print("detection_B = ", self.detections_b)
+        #print("detection_B = ", self.detections_b)
 
     def add_lobster_detections(self,id_a ,key,value):
         lobster_dict = {
@@ -54,13 +54,14 @@ class Match:
             if str(id_a) in self.lobster_detections:
                 if self.lobster_detections[str(id_a)]["sex_detection"] == None:
                     self.lobster_detections[str(id_a)][key] = value
-                    print("in detection but not have sex,", key)
+                    #print("in detection but not have sex,", key)
                 else:
-                    print("in detection but already have sex")
+                    pass
+                    #print("in detection but already have sex")
             else:
                 lobster_dict[key] = value
                 self.lobster_detections[str(id_a)] = lobster_dict
-                print("not in detection,", key)
+                #print("not in detection,", key)
         
     def dictToList(self,lobsterDict):
         classList = []
@@ -130,9 +131,9 @@ class Match:
                     else:
                         self.add_lobster_detections(key,"sex_detection",stat.mode(self.waitclass))
                         self.waitclass.clear()
-                        print("add lobster detection and change the sex detection")
+                        #print("add lobster detection and change the sex detection")
                         self.usedTrack.append(lobster_id)
-                        print("used Track", self.usedTrack)
+                        #print("used Track", self.usedTrack)
                         value["number_detection"]["score"] = float(self.detections_b[i]["score"])
                         break
         return self.lobster_detections
@@ -146,9 +147,9 @@ class Match:
             if (str(ids) not in self.tempclass):
                 self.tempclass[str(ids)] = []
                 self.tempclass[str(ids)].append(class_ids)
-                print("start record tempclass",str(ids))
+                #print("start record tempclass",str(ids))
             else:
-                print("append tempclass")
+                #print("append tempclass")
                 self.tempclass[str(ids)].append(class_ids)
 
             if (len(self.tempclass[str(ids)])<3):
@@ -159,6 +160,6 @@ class Match:
                 mode = stat.mode(self.tempclass[str(ids)])
                 finalclass.append(mode)
 
-        print("self.finalclass before return is ",str(finalclass))
+        #print("self.finalclass before return is ",str(finalclass))
         return finalclass
         

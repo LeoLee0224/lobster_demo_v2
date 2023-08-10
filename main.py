@@ -12,6 +12,7 @@ from asone import ASOne
 import asone.utils as utils
 from detect import Detect
 import copy
+from output import Output
 
 class ObjectDetection:
 
@@ -39,14 +40,27 @@ class ObjectDetection:
         model = YOLO("./assets/best_v2.pt")
         model.fuse()
         return model
+    
+    def get_time_set(self):
+        return 3
+    
+    def get_magnifier_set(self):
+        return 100
+    
+    def get_bias_level(self):
+        return 5
 
     def __call__(self):
+        path = "mainlog.txt"
+        tfile = open(path,"w")
         # Instantiate Asone object
         detect1 = ASOne(tracker=asone.BYTETRACK, detector=asone.YOLOV8M_PYTORCH, use_cuda=False) #set use_cuda=False to use cpu
         detect2 = ASOne(tracker=asone.BYTETRACK, detector=asone.YOLOV8M_PYTORCH, use_cuda=False)
         filter_classes = None # set to None to track all classes
         die1 = Detect()
         die2 = Detect()
+        output1 = Output(1)
+        output2 = Output(2)
 
         # ##############################################
         #           To track using video file
@@ -60,27 +74,27 @@ class ObjectDetection:
         track1 = detect1.track_video(self.capture_index1, output_dir='runs/detect1', save_result=True, 
                                    display=True, filter_classes=filter_classes, 
                                    draw_trails = False, class_names = self.CLASS_NAMES_DICT1)
-        print("finished 1, ",track1)
+        #print("finished 1, ",track1)
         track2 = detect2.track_video(self.capture_index2, output_dir='runs/detect2', save_result=True, 
                                    display=True, filter_classes=filter_classes, 
                                    draw_trails = False, class_names = self.CLASS_NAMES_DICT1)
-        print("finished 2, ",track2)
+        #print("finished 2, ",track2)
         # Loop over track to retrieve outputs of each frame 
-        print("going")
+        #print("going")
         a = 0
         for bbox_details1, frame_details1 in track1:
-            print("start for loop")
+            #print("start for loop")
             bbox_xyxy1, ids1, scores1, class_ids1 = bbox_details1
             frame1, frame_num1, fps1, width1, height1, save_path1 = frame_details1
             #self.match.confidenceAndEdit(bbox_xyxy1,class_ids1,scores1,ids1,0.7)
             #self.match.add_detection_a(bbox_xyxy1,class_ids1,scores1,frame_num1,ids1)
-            print("finished call track1 data")
+            #print("finished call track1 data")
             bbox_details2, frame_details2 = next(track2)
             bbox_xyxy2, ids2, scores2, class_ids2 = bbox_details2
             frame2, frame_num2, fps2, width2, height2, save_path2 = frame_details2
             #self.match.confidenceAndEdit(bbox_xyxy2,class_ids2,scores2,ids2,0.7)
             #self.match.add_detection_b(bbox_xyxy2,class_ids2,scores2,frame_num2,ids2)
-            print("finished call track2 data")
+            #print("finished call track2 data")
             #match_result = self.match.match_detections()
             #print("match_result = ",match_result)
             #matchClass, matchids, matchScore = self.match.dictToList(match_result)
@@ -108,7 +122,7 @@ class ObjectDetection:
             #     i = i + 1
             # for i in range(len(matchScore)):
             #     matchScore[i] = (matchScore[i]+matchOriScore[i])/2
-            print("write boxese")
+            #print("write boxese")
             #print scores class_ids and ids
             cleanframe1 = copy.deepcopy(frame1)
             cleanframe2 = copy.deepcopy(frame2)
@@ -184,14 +198,11 @@ class ObjectDetection:
 
             videowriter1.write(frame1)
             videowriter2.write(frame2)
-            path = "mainlog.txt"
-            tfile = open(path,"a")
-            magnifier = 100
-            dead1 = die1.detecting(bbox_xyxy1, 3, 5)
-            dead2 = die2.detecting(bbox_xyxy2, 3, 5)
+            dead1 = die1.detecting(bbox_xyxy1, self.get_time_set(), self.get_bias_level())
+            dead2 = die2.detecting(bbox_xyxy2, self.get_time_set(), self.get_bias_level())
             framehig1, framewid1, _ = frame1.shape
             framehig2, framewid2, _ = frame2.shape
-            print("framehig1 = ",framehig1, "framewid = ", framewid1)
+            #print("framehig1 = ",framehig1, "framewid = ", framewid1)
             if dead1 != []:
                 print("---------",file=tfile)
                 print("---------",file=tfile)
@@ -206,11 +217,13 @@ class ObjectDetection:
                                 draw_trails=False,
                                 class_names=self.CLASS_NAMES_DICT1)
                             print("bbox = ",bbox_xyxy1[j],"track_id = ",ids1[j],file=tfile)
-                            crop_image1 = Detect.bboxcrop(cleanframe1,bbox_xyxy1[j],framewid1,framehig1,magnifier)
-                            img_name1 = "runs/detect3/output"+str(frame_num1)+"_"+str(i)+".jpg"
-                            cv2.imwrite(img_name1,crop_image1)
-                            full_img_name1 = "runs/detect3/fulloutput"+str(frame_num1)+"_"+str(i)+".jpg"
-                            cv2.imwrite(full_img_name1,cleanframe1)
+                            crop_image1 = Detect.bboxcrop(cleanframe1,bbox_xyxy1[j],framewid1,framehig1,self.get_magnifier_set())
+                            #img_name1 = "runs/detect3/output"+str(frame_num1)+"_"+str(i)+".jpg"
+                            # cv2.imwrite(img_name1,crop_image1)
+                            # full_img_name1 = "runs/detect3/fulloutput"+str(frame_num1)+"_"+str(i)+".jpg"
+                            # cv2.imwrite(full_img_name1,cleanframe1)
+                            output1.store_list(cleanframe1,crop_image1,ids1[j])
+                            
 
             if dead2 != []:
                 print("---------",file=tfile)
@@ -226,29 +239,29 @@ class ObjectDetection:
                                 draw_trails=False,
                                 class_names=self.CLASS_NAMES_DICT1)
                             print("bbox = ",bbox_xyxy2[j],"track_id = ",ids2[j],file=tfile)
-                            crop_image2 = Detect.bboxcrop(cleanframe2,bbox_xyxy2[j],framewid2,framehig2,magnifier)
-                            img_name2 = "runs/detect4/output"+str(frame_num2)+"_"+str(i)+".jpg"
-                            cv2.imwrite(img_name2,crop_image2)
-                            full_img_name2 = "runs/detect4/fulloutput"+str(frame_num1)+"_"+str(i)+".jpg"
-                            cv2.imwrite(full_img_name2,cleanframe2)
-
-            tfile.close()
+                            crop_image2 = Detect.bboxcrop(cleanframe2,bbox_xyxy2[j],framewid2,framehig2,self.get_magnifier_set())
+                            #img_name2 = "runs/detect4/output"+str(frame_num2)+"_"+str(i)+".jpg"
+                            # cv2.imwrite(img_name2,crop_image2)
+                            # full_img_name2 = "runs/detect4/fulloutput"+str(frame_num1)+"_"+str(i)+".jpg"
+                            # cv2.imwrite(full_img_name2,cleanframe2)
+                            output2.store_list(cleanframe2,crop_image2,ids2[j])
             # Do anything with bboxes here
-            print("ids1 = ",ids1)
-            print("scores1 = ",scores1)
-            print("class_ids1 = ",class_ids1)
-            print("frame_num1 = ",frame_num1)
-            print("fps1 = ",fps1)
-            print("ids2 = ",ids2)
-            print("scores2 = ",scores2)
-            print("class_ids2 = ",class_ids2)
-            print("frame_num2 = ",frame_num2)
-            print("fps2 = ",fps2)
-            print("save_path1 = ",save_path1)
+            # print("ids1 = ",ids1)
+            # print("scores1 = ",scores1)
+            # print("class_ids1 = ",class_ids1)
+            # print("frame_num1 = ",frame_num1)
+            # print("fps1 = ",fps1)
+            # print("ids2 = ",ids2)
+            # print("scores2 = ",scores2)
+            # print("class_ids2 = ",class_ids2)
+            # print("frame_num2 = ",frame_num2)
+            # print("fps2 = ",fps2)
+            # print("save_path1 = ",save_path1)
             a = a + 1
 
         cv2.destroyWindow(cam1)
         cv2.destroyWindow(cam2)
+        tfile.close()
 
 
 detector = ObjectDetection("./assets/cam1_demo3.mp4","./assets/cam1_demo3.mp4")

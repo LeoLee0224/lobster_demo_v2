@@ -77,8 +77,8 @@ class Detect:
         endpoint_x = int(bbox_xyxy[2]+magnifier)
         startpoint_y = int(bbox_xyxy[1]-magnifier)
         startpoint_x = int(bbox_xyxy[0]-magnifier)
-        print("range1",range(startpoint_y,endpoint_y))
-        print("range2",range(startpoint_x,endpoint_x))
+        # print("range1",range(startpoint_y,endpoint_y))
+        # print("range2",range(startpoint_x,endpoint_x))
         wid = endpoint_x - startpoint_x
         hig = endpoint_y - startpoint_y
         if  startpoint_x < 0:
@@ -87,7 +87,7 @@ class Detect:
         if  startpoint_y < 0:
             startpoint_y = 0
             endpoint_y = endpoint_y - startpoint_y
-        print("framewid1 = ",framewid, "framehig1 = ", framehig)
+        #print("framewid1 = ",framewid, "framehig1 = ", framehig)
         if  endpoint_x > framewid:
             endpoint_x = framewid
             startpoint_x = startpoint_x - (endpoint_x - framewid)
@@ -96,10 +96,10 @@ class Detect:
             startpoint_y = startpoint_y - (endpoint_y - framehig)
             
         crop_image = frame[startpoint_y:endpoint_y, startpoint_x:endpoint_x,:]
-        print("frameshape = ",frame.shape)
-        print("hig = ", hig, "wid = ", wid)
-        print("cropshape = ",crop_image.shape)
-        print("cropimage = ", crop_image)
+        # print("frameshape = ",frame.shape)
+        # print("hig = ", hig, "wid = ", wid)
+        # print("cropshape = ",crop_image.shape)
+        # print("cropimage = ", crop_image)
         return crop_image
 
 
