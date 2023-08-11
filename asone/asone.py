@@ -22,8 +22,8 @@ class ASOne:
                  num_classes=80
                  ) -> None:
         self.configss = copy.deepcopy(config)
-        print("self.configs = ", self.configss)
-        print("config = ", config)
+        #print("self.configs = ", self.configss)
+        #print("config = ", config)
         self.use_cuda = use_cuda
 
         # get detector object
@@ -57,15 +57,15 @@ class ASOne:
 
     def _update_args(self, kwargs):
         for key, value in kwargs.items():
-            print("kwarg items = ",kwargs.items())
-            print("start update args, key = ",key,"value = ",value)
-            print("config.keys = ",self.configss.keys())
+            #print("kwarg items = ",kwargs.items())
+            #print("start update args, key = ",key,"value = ",value)
+            #print("config.keys = ",self.configss.keys())
             if key in self.configss.keys():
-                print("key in config.keys")
+                #print("key in config.keys")
                 self.configss[key] = value
-                print("finish key input")
+                #print("finish key input")
             else:
-                print("key is NOT in config.keys")
+                #print("key is NOT in config.keys")
                 print(f'"{key}" argument not found! valid args: {list(self.configss.keys())}')
                 exit()
         return self.configss
@@ -87,13 +87,13 @@ class ASOne:
                     video_path,
                     **kwargs
                     ):
-        print("start track_video")            
+        #("start track_video")            
         output_filename = os.path.basename(video_path)
-        print("1")
+        #print("1")
         kwargs['filename'] = output_filename
-        print("output kwargs = ", kwargs)
+        #print("output kwargs = ", kwargs)
         self.configss = self._update_args(kwargs)
-        print("start tracking")
+        #print("start tracking")
         for (bbox_details, frame_details) in self._start_tracking(video_path, self.configss):
             # yeild bbox_details, frame_details to main script
             yield bbox_details, frame_details
@@ -228,11 +228,15 @@ class ASOne:
     def _start_tracking(self,
                         stream_path: str,
                         config: dict) -> tuple:
-        print("ASone Start tracking")
+        #print("ASone Start tracking")
         if not self.tracker:
             print(f'No tracker is selected. use detect() function perform detcetion or pass a tracker.')
             exit()
-        print("start config.pop")
+        # else:
+        #     print("self.tracker = ",self.tracker)
+        #     self.tracker = copy.deepcopy(self.tracker)
+        #     print("self.tracker2 = ",self.tracker)
+        #print("start config.pop")
         fps = config.pop('fps')
         output_dir = config.pop('output_dir')
         filename = config.pop('filename')
@@ -241,9 +245,9 @@ class ASOne:
         draw_trails = config.pop('draw_trails')
         class_names = config.pop('class_names')
         #class_names = ["lobster"]
-        print("start video capture")
+        #print("start video capture")
         cap = cv2.VideoCapture(stream_path)
-        print("finished video capture")
+        #print("finished video capture")
         cap.set(cv2.CAP_PROP_BUFFERSIZE, 3)
         width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
         height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
@@ -329,7 +333,7 @@ class ASOne:
                 break
 
             # yeild required values in form of (bbox_details, frames_details)
-            print("before yield")
+            #print("before yield")
             yield (bboxes_xyxy, ids, scores, class_ids), (im0 if display else frame, frame_id-1, fps,  width, height, save_path)
 
         tac = time.time()

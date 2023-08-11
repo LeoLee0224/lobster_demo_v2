@@ -82,7 +82,7 @@ def draw_boxes(img, bbox_xyxy, class_ids, identities=None, draw_trails=False, of
         
         # if class_ids is not None:
         color = compute_color_for_labels(int(class_ids[i]))
-        print("class_names = ",class_names)
+        #print("class_names = ",class_names)
 
         if class_names:
             obj_name = class_names[int(class_ids[i])]
