@@ -207,5 +207,6 @@ class ObjectDetection:
 rstp_url = ['rtsp://admin:pp123123@192.168.8.47:554/Streaming/channels/201',
             'rtsp://admin:pp123123@192.168.8.47:554/Streaming/channels/101', 'http://admin:pp123123@192.168.8.38/Streaming/channels/102/httppreview']
 
-detector = ObjectDetection(rstp_url[1],rstp_url[0])
+# detector = ObjectDetection(rstp_url[1],rstp_url[0])
+detector = ObjectDetection("0","0")
 detector()
