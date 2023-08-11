@@ -6,3 +6,5 @@ loguru==0.7.0
 gdown==4.7.1
 onnxruntime==1.15.1
 coremltools==6.3.0
+flask==2.3.2
+flask-restful==0.3.10
