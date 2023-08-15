@@ -56,18 +56,19 @@ class Detect:
         if self.same == []:
             self.same.append(diction)
         else:
-            pop_list = []
             matched = False
-            for i in range(len(self.same)):
+            i = 0
+            leng = len(self.same)
+            while i < leng:
                 if self.bias(self.same[i]["xyxy"],target):
                     matched = True
                     self.same[i]["xyxy"] = target
                     self.same[i]["time"] += 1
-                    if self.same[i]["time"] == self.time:
-                        pop_list.append(i)
-            if pop_list != []:
-                for i in pop_list:
-                    self.return_list.append(self.same.pop(i))
+                    if self.same[i]["time"] >= self.time:
+                        self.return_list.append(self.same.pop(i))
+                        i = i - 1
+                        leng = leng - 1
+                i = i + 1
             if matched == False:
                 self.same.append(diction)
 

@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_restful import Api, Resource
-from app import sever
+from flaskapp import sever
 import threading
 import time
 

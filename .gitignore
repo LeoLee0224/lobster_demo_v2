@@ -1,3 +1,4 @@
+*.pyc
 assets
 python_modules
 .pyenv
@@ -5,5 +6,7 @@ runs
 .menv
 /yolov7
 /yolov8
-*.pyc
-__pycache__/
+__pycache__
+asone/__pycache__
+asone/detectors/__pycache__
+
