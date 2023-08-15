@@ -7,6 +7,4 @@ runs
 /yolov7
 /yolov8
 __pycache__
-asone/__pycache__
-asone/detectors/__pycache__
 /*.txt
