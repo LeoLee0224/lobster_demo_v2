@@ -8,3 +8,4 @@ runs
 /yolov8
 __pycache__
 /*.txt
+.DS_Store

@@ -3,7 +3,6 @@ from flaskapp import TimeSet
 
 class Output:
     def __init__(self,camera_number) -> None:
-        self.out_list = []
         self.cam_num = camera_number
         path = "output_log"+str(camera_number)+".txt"
         self.tfile = open(path,"w")
@@ -21,21 +20,16 @@ class Output:
             "cam_id": self.cam_num,
             "time": time.time()
         }
-        self.out_list.append(alert)
+        self.print_list(alert)
+        #send
 
-    def clean_list(self):
-        self.out_list = []
-
-    def print_list(self):
+    def print_list(self, alert):
         self.open_log()
         print("------",file=self.tfile)
-        for i in range(len(self.out_list)):
-            print(str(self.out_list[i]["track_id"]),str(self.out_list[i]["cam_id"]),file=self.tfile)
+        print(str(alert["track_id"]),str(alert["cam_id"]),file=self.tfile)
         print("------",file=self.tfile)
         self.close_log()
         
-
-
     def print_time(self):
         self.open_log()
         print("-------",file=self.tfile)

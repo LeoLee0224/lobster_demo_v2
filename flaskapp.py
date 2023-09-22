@@ -26,5 +26,5 @@ class sever:
         api = Api(app)
         api.add_resource(TimeSet, '/timeset')
         api.add_resource(HelloWorld,'/')
-        app.run()
+        app.run(port=8100)
 

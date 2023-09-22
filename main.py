@@ -134,9 +134,7 @@ class ObjectDetection:
                                 draw_trails=False,
                                 class_names=self.CLASS_NAMES_DICT1)
                             crop_image1 = Detect.bboxcrop(cleanframe1,bbox_xyxy1[j],framewid1,framehig1,self.magnifier)
-                            output1.store_list(cleanframe1,crop_image1,ids1[j])
-            output1.print_list()
-            output1.clean_list()   
+                            output1.store_list(cleanframe1,crop_image1,ids1[j]) 
 
             if dead2 != []:
                 for i in range(len(dead2)):
@@ -150,8 +148,6 @@ class ObjectDetection:
                                 class_names=self.CLASS_NAMES_DICT1)
                             crop_image2 = Detect.bboxcrop(cleanframe2,bbox_xyxy2[j],framewid2,framehig2,self.magnifier)
                             output2.store_list(cleanframe2,crop_image2,ids2[j])
-            output2.print_list()
-            output2.clean_list()
             a = a + 1
 
         cv2.destroyWindow(cam1)
